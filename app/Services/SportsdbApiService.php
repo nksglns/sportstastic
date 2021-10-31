@@ -70,7 +70,8 @@ class SportsdbApiService implements DataSourceApiInterface
     public function fetchTeams(int $league_id):Collection
     {
         if (!is_int($league_id) || $league_id <= 0) {
-            throw new Exception('Invalid league id used');
+            Log::warning('Invalid league id used in fetchTeams');
+            return collect();
         }
         $entries = $this->getApiEntries('lookup_all_teams.php?id='.$league_id, 'teams')->map(function ($entry) {
             $leagues = [];
@@ -83,9 +84,9 @@ class SportsdbApiService implements DataSourceApiInterface
                 'team_name' => $entry['strTeam'] ?? null,
                 'team_logo' => $entry['strTeamLogo'] ?? null,
                 'team_banner' => $entry['strTeamBanner'] ?? null,
-                'stadium_name' => $entry['strStadium'] ?? null,
-                'website' => $entry['strWebsite'] ?? null,
-                'description' => $entry['strDescriptionEN'] ?? null,
+                'stadium_name' => isset($entry['strWebsite']) ? mb_substr($entry['strStadium'], 0, 191) : '',
+                'website' => isset($entry['strWebsite']) ? mb_substr($entry['strWebsite'], 0, 191) : '',
+                'description' => isset($entry['strDescriptionEN']) ? mb_substr($entry['strDescriptionEN'], 0, 191) : '',
                 'leagues' => collect($leagues)->filter()->unique(),
             ];
         });
@@ -95,7 +96,8 @@ class SportsdbApiService implements DataSourceApiInterface
     public function fetchStandings(int $league_id):Collection
     {
         if (!is_int($league_id) || $league_id <= 0) {
-            throw new Exception('Invalid league id used');
+            Log::warning('Invalid league id used in fetchStandings');
+            return collect();
         }
         $entries = $this->getApiEntries('lookuptable.php?l='.$league_id, 'table')->map(function ($entry) use ($league_id) {
             return [
