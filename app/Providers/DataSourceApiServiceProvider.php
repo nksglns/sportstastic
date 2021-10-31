@@ -6,7 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use App\Interfaces\DataSourceApiInterface;
 use App\Services\SportsdbApiService;
 
-class DataSourceApiProvider extends ServiceProvider
+class DataSourceApiServiceProvider extends ServiceProvider
 {
     /**
      * Register services.

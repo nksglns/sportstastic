@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Http;
 use App\Interfaces\DataSourceApiInterface;
 use Illuminate\Support\Collection;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class SportsdbApiService implements DataSourceApiInterface
 {
@@ -24,7 +25,8 @@ class SportsdbApiService implements DataSourceApiInterface
     public function getApiEntries($endpoint, $entriesIndex)
     {
         if (!$endpoint) {
-            throw new Exception('Endpoint was not defined');
+            Log::warning('Empty response from sportsdb API received');
+            return collect();
         }
         $url = self::$sportsdb_base_url.$endpoint;
         $response = Http::withoutVerifying()
@@ -33,23 +35,35 @@ class SportsdbApiService implements DataSourceApiInterface
                     ->get($url);
         if ($response->ok()) {
             $entries = $response->json();
-            var_dump($entries);
             if ($entries && $entriesIndex && isset($entries[$entriesIndex])) {
                 return collect($entries[$entriesIndex]);
             }
-            throw new Exception('Empty response from sportsdb API received');
+            Log::warning('Empty response from sportsdb API received');
+            return collect();
         }
     }
 
     public function fetchSports():Collection
     {
-        $entries = $this->getApiEntries('all_sports.php', 'sports');
+        $entries = $this->getApiEntries('all_sports.php', 'sports')->map(function ($entry) {
+            return [
+                'id' => $entry['idSport'] ?? null,
+                'sport_name' => $entry['strSport'] ?? null,
+                'thumb' => $entry['strSportThumb'] ?? null,
+            ];
+        });
         return $entries;
     }
 
     public function fetchLeagues():Collection
     {
-        $entries = $this->getApiEntries('all_leagues.php', 'leagues');
+        $entries = $this->getApiEntries('all_leagues.php', 'leagues')->map(function ($entry) {
+            return [
+                'id' => $entry['idLeague'] ?? null,
+                'league_name' => $entry['strLeague'] ?? null,
+                'sport_name' => $entry['strSport'] ?? null,
+            ];
+        });
         return $entries;
     }
 
@@ -58,16 +72,47 @@ class SportsdbApiService implements DataSourceApiInterface
         if (!is_int($league_id) || $league_id <= 0) {
             throw new Exception('Invalid league id used');
         }
-        $entries = $this->getApiEntries('lookup_all_teams.php?id='.$league_id, 'teams');
+        $entries = $this->getApiEntries('lookup_all_teams.php?id='.$league_id, 'teams')->map(function ($entry) {
+            $leagues = [];
+            $leagues[] = $entry['idLeague'] ?? null;
+            for ($i = 0; $i <= 7; $i++) {
+                $leagues[] = $entry['idLeague'.$i] ?? null;
+            }
+            return [
+                'id' => $entry['idTeam'] ?? null,
+                'team_name' => $entry['strTeam'] ?? null,
+                'team_logo' => $entry['strTeamLogo'] ?? null,
+                'team_banner' => $entry['strTeamBanner'] ?? null,
+                'stadium_name' => $entry['strStadium'] ?? null,
+                'website' => $entry['strWebsite'] ?? null,
+                'description' => $entry['strDescriptionEN'] ?? null,
+                'leagues' => collect($leagues)->filter()->unique(),
+            ];
+        });
         return $entries;
     }
 
-    public function fetchStandings(int $team_id):Collection
+    public function fetchStandings(int $league_id):Collection
     {
-        if (!is_int($team_id) || $team_id <= 0) {
+        if (!is_int($league_id) || $league_id <= 0) {
             throw new Exception('Invalid league id used');
         }
-        $entries = $this->getApiEntries('lookup_all_teams.php?id='.$team_id, 'table');
+        $entries = $this->getApiEntries('lookuptable.php?l='.$league_id, 'table')->map(function ($entry) use ($league_id) {
+            return [
+                'id' => $entry['idStanding'] ?? null,
+                'team_id' => $entry['idTeam'] ?? null,
+                'league_id' => $entry['idLeague'] ?? $league_id,
+                'team_rank' => $entry['intRank'] ?? 0,
+                'goals_for' => $entry['intGoalsFor'] ?? 0,
+                'goals_against' => $entry['intGoalsAgainst'] ?? 0,
+                'goals_difference' => $entry['intGoalsDifference'] ?? 0,
+                'wins' => $entry['intWin'] ?? 0,
+                'losses' => $entry['intLoss'] ?? 0,
+                'draws' => $entry['intDraw'] ?? 0,
+                'points' => $entry['intPoints'] ?? 0,
+                'season' => $entry['strSeason'] ?? null,
+            ];
+        });
         return $entries;
     }
 }
