@@ -6,9 +6,11 @@ use Illuminate\Support\Str;
 
 class League extends BaseModel
 {
-    protected $fillable = ['id', 'league_name', 'slug', 'sport_id'];
+    protected $fillable = ['league_name', 'slug', 'sport_id', 'remote_id'];
+
+    // Set the absolutely necessary validation rules
     public static $validateRules = [
-        'id' => 'required|integer',
+        'remote_id' => 'integer',
         'league_name' => 'required|string|max:191',
     ];
 
@@ -34,6 +36,6 @@ class League extends BaseModel
     public function setLeagueNameAttribute($value)
     {
         $this->attributes['league_name'] = $value;
-        $this->attributes['slug'] ??= Str::slug(Str::substr($value, 0, 150));
+        $this->attributes['slug'] = $this->attributes['slug'] ?? Str::slug(Str::substr($value, 0, 150));
     }
 }

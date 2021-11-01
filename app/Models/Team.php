@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
+use App\Traits\HasImage;
 use Illuminate\Support\Str;
 
 class Team extends BaseModel
 {
-    protected $fillable = ['id', 'team_name', 'stadium_name', 'website', 'description'];
+    use HasImage;
+
+    protected $fillable = ['team_name', 'stadium_name', 'website', 'description', 'remote_id'];
+
+    // Set the absolutely necessary validation rules
     public static $validateRules = [
-        'id' => 'required|integer',
+        'remote_id' => 'integer',
         'team_name' => 'required|string|max:191',
     ];
 
@@ -34,6 +39,6 @@ class Team extends BaseModel
     public function setTeamNameAttribute($value)
     {
         $this->attributes['team_name'] = $value;
-        $this->attributes['slug'] ??= Str::slug(Str::substr($value, 0, 150));
+        $this->attributes['slug'] = $this->attributes['slug'] ?? Str::slug(Str::substr($value, 0, 150));
     }
 }
