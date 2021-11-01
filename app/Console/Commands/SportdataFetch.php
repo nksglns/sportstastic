@@ -4,11 +4,10 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Interfaces\DataSourceApiInterface;
-use App\Repositories\LeagueRepository;
-use App\Repositories\SportRepository;
-use App\Repositories\TeamRepository;
-use \Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
+use App\Interfaces\LeagueRepositoryInterface;
+use App\Interfaces\SportRepositoryInterface;
+use App\Interfaces\StandingRepositoryInterface;
+use App\Interfaces\TeamRepositoryInterface;
 
 class SportdataFetch extends Command
 {
@@ -43,41 +42,62 @@ class SportdataFetch extends Command
      */
     public function handle(
         DataSourceApiInterface $apiInterface,
-        SportRepository $sportRepository,
-        LeagueRepository $leagueRepository,
-        TeamRepository $teamRepository
-    )
-    {
+        SportRepositoryInterface $sportRepository,
+        LeagueRepositoryInterface $leagueRepository,
+        TeamRepositoryInterface $teamRepository,
+        StandingRepositoryInterface $standingRepository
+    ) {
+
+        $this->info('Starting sports import.');
         $remoteSports = $apiInterface->fetchSports();
         foreach ($remoteSports as $sport) {
             $sportRepository->save($sport);
         }
-        $remoteLeagues = $apiInterface->fetchLeagues();
-        $localSports = $sportRepository->allByKey();
-        foreach ($remoteLeagues as $league) {
-            $leagueSportName = Str::lower($league['sport_name']);
-            if ($localSports->has($leagueSportName)) {
-                $league['sport_id'] = $localSports->get($leagueSportName)->id;
-                $leagueRepository->save($league);
-                $teams = $apiInterface->fetchTeams($league['id']);
-                foreach ($teams as $team) {
-                    $teamRepository->save($team);
-                }
-                usleep(500000);
-            } else {
-                Log::warning('A sport id was not found for '.$leagueSportName);
-            }
+        $this->info('Sports import finished.');
 
-            /*var_dump($league);
-            $teams = $apiInterface->fetchTeams($league->id);
-            foreach ($teams as $team) {
-                var_dump($team);
-            }
-            $standings = $apiInterface->fetchStandings($league->id);
-            foreach ($standings as $standing) {
-                var_dump($standing);
-            }*/
+
+
+        $this->info('Starting import for leagues.');
+        $remoteLeagues = $apiInterface->fetchLeagues();
+
+        //First loop through teams that are needed for both teams & standings
+        foreach ($remoteLeagues as $league) {
+            $leagueRepository->save($league);
         }
+        $this->info('Leagues import finished.');
+
+
+        //Loop through the leagues again to import related teams
+        $this->info('Starting import for league teams.');
+        $leaguesProgressBar = $this->output->createProgressBar($remoteLeagues->count());
+
+        foreach ($remoteLeagues as $league) {
+            $remoteTeams = $apiInterface->fetchTeams($league['remote_id']);
+            foreach ($remoteTeams as $team) {
+                $teamRepository->save($team);
+            }
+            $leaguesProgressBar->advance();
+        }
+        $leaguesProgressBar->finish();
+        $this->info(PHP_EOL);
+        $this->info('League teams import finished.');
+
+
+        //One last loop through leagues to import related standings
+        $this->info('Starting import for league standings.');
+        $leaguesProgressBar = $this->output->createProgressBar($remoteLeagues->count());
+        foreach ($remoteLeagues as $league) {
+            $remoteStandings = $apiInterface->fetchStandings($league['remote_id']);
+            foreach ($remoteStandings as $standing) {
+                $standingRepository->save($standing);
+            }
+            $leaguesProgressBar->advance();
+        }
+        $leaguesProgressBar->finish();
+        $this->info(PHP_EOL);
+        $this->info('League team standings import finished.');
+
+
         return Command::SUCCESS;
     }
 }

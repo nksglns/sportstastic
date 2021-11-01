@@ -26,7 +26,9 @@ class SportsdbApiService implements DataSourceApiInterface
     public function getApiEntries($endpoint, $entriesIndex)
     {
         if (!$endpoint) {
-            Log::warning('No endpoint defined for the API');
+            if (config('logging.log_application_warnings')) {
+                Log::warning('No endpoint defined for the API');
+            }
             return collect();
         }
         $url = self::$sportsdb_base_url . $endpoint;
@@ -39,7 +41,9 @@ class SportsdbApiService implements DataSourceApiInterface
             if ($entries && $entriesIndex && isset($entries[$entriesIndex])) {
                 return collect($entries[$entriesIndex]);
             }
-            Log::warning('Empty response from sportsdb API received: ' . $url);
+            if (config('logging.log_application_warnings')) {
+                Log::warning('Empty response from sportsdb API received: ' . $url);
+            }
             return collect();
         }
     }
@@ -71,7 +75,9 @@ class SportsdbApiService implements DataSourceApiInterface
     public function fetchSingleTeam(int $team_id): Collection
     {
         if (!is_int($team_id) || $team_id <= 0) {
-            Log::warning('Invalid team id used in fetchSingleTeam: ' . $team_id);
+            if (config('logging.log_application_warnings')) {
+                Log::warning('Invalid team id used in fetchSingleTeam: ' . $team_id);
+            }
             return collect();
         }
         $entries = $this->getApiEntries('lookupteam.php?id=' . $team_id, 'teams')->map(function ($entry) {
@@ -96,7 +102,9 @@ class SportsdbApiService implements DataSourceApiInterface
     public function fetchTeams(int $league_id): Collection
     {
         if (!is_int($league_id) || $league_id <= 0) {
-            Log::warning('Invalid league id used in fetchTeams: ' . $league_id);
+            if (config('logging.log_application_warnings')) {
+                Log::warning('Invalid league id used in fetchTeams: ' . $league_id);
+            }
             return collect();
         }
         $entries = $this->getApiEntries('lookup_all_teams.php?id=' . $league_id, 'teams')->map(function ($entry) {
@@ -121,7 +129,9 @@ class SportsdbApiService implements DataSourceApiInterface
     public function fetchStandings(int $league_id): Collection
     {
         if (!is_int($league_id) || $league_id <= 0) {
-            Log::warning('Invalid league id used in fetchStandings: ' . $league_id);
+            if (config('logging.log_application_warnings')) {
+                Log::warning('Invalid league id used in fetchStandings: ' . $league_id);
+            }
             return collect();
         }
         $entries = $this->getApiEntries('lookuptable.php?l=' . $league_id, 'table')->map(function ($entry) use ($league_id) {

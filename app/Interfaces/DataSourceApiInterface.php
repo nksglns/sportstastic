@@ -12,14 +12,14 @@ interface DataSourceApiInterface
      *
      * @return Collection
      */
-    public function fetchSports():Collection;
+    public function fetchSports(): Collection;
 
     /**
      * Fetches a collection of leagues from the API
      *
      * @return Collection
      */
-    public function fetchLeagues():Collection;
+    public function fetchLeagues(): Collection;
 
     /**
      * Fetches a collection of teams participating in a league from the API
@@ -28,7 +28,15 @@ interface DataSourceApiInterface
      *
      * @return Collection
      */
-    public function fetchTeams(int $league_id):Collection;
+    public function fetchTeams(int $league_id): Collection;
+
+    /**
+     * Fetches a single team details from the API
+     * @param int $team_id
+     *
+     * @return Collection
+     */
+    public function fetchSingleTeam(int $team_id): Collection;
 
     /**
      * Fetches a collection of team standings from the API
@@ -37,5 +45,5 @@ interface DataSourceApiInterface
      *
      * @return Collection
      */
-    public function fetchStandings(int $team_id):Collection;
+    public function fetchStandings(int $team_id): Collection;
 }
