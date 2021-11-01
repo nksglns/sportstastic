@@ -4,7 +4,8 @@ namespace App\Repositories;
 
 use App\Interfaces\TeamRepositoryInterface;
 use App\Models\Team;
-use Illuminate\Support\Collection;
+use App\Models\League;
+use Illuminate\Support\Facades\Log;
 
 class TeamRepository extends BaseRepository implements TeamRepositoryInterface
 {
@@ -18,15 +19,16 @@ class TeamRepository extends BaseRepository implements TeamRepositoryInterface
         $return = parent::save($data);
         if ($return) {
             if (isset($data['leagues']) && count($data['leagues']) > 0) {
-                $team = $this->model->find($data['id']);
-                $team->leagues()->sync($data['leagues']);
+                $team = $this->model->where('remote_id', $data['remote_id'])->first();
+                $leagues = League::whereIn('remote_id', $data['leagues'])->pluck('id');
+                if ($leagues->count() < count($data['leagues'])) {
+                    if (config('logging.log_application_warnings')) {
+                        Log::warning('One or more leagues not found for the team ' . $data['remote_id']);
+                    }
+                }
+                $team->leagues()->sync($leagues);
             }
         }
         return $return;
-    }
-
-    public function all(): Collection
-    {
-        return $this->model->all();
     }
 }
