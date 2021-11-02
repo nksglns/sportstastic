@@ -17,6 +17,7 @@ Run the migrations
 $ php artisan migrate
 ```
 Run the database import command. This might take a while. This can also be used in the /app/Console/Kernel.php to setup a periodical update.
+Possible errors will be logged at laravel's error log.
 
 ```bash
 $ php artisan sportdata:fetch
