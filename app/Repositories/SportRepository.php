@@ -11,4 +11,12 @@ class SportRepository extends BaseRepository implements SportRepositoryInterface
     {
         $this->model = $model;
     }
+
+    public function leaguesBySportSlug($sportSlug)
+    {
+        if (!$sportSlug || !$sport = Sport::where('slug', $sportSlug)->first()) {
+            return false;
+        }
+        return $sport->leagues()->get();
+    }
 }

@@ -31,4 +31,12 @@ class TeamRepository extends BaseRepository implements TeamRepositoryInterface
         }
         return $return;
     }
+
+    public function findBySlug($teamSlug)
+    {
+        if (!$teamSlug || !$team = Team::where('slug', $teamSlug)->with('leagues', 'standings', 'standings.league')->first()) {
+            return false;
+        }
+        return $team;
+    }
 }

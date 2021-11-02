@@ -34,4 +34,12 @@ class LeagueRepository extends BaseRepository implements LeagueRepositoryInterfa
         }
         return parent::save($data);
     }
+
+    public function teamsByLeagueSlug($leagueSlug)
+    {
+        if (!$leagueSlug || !$league = League::where('slug', $leagueSlug)->first()) {
+            return false;
+        }
+        return $league->teams()->with('leagues', 'standings', 'standings.league')->get();
+    }
 }

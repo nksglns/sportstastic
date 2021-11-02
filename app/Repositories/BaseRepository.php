@@ -16,6 +16,10 @@ class BaseRepository implements BaseRepositoryInterface
         $this->model = $model;
     }
 
+    public function all(){
+        return $this->model->get();
+    }
+
     /**
      * Fill and create a new entry or update it if it exists
      *
