@@ -2,6 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\SportController;
+use App\Http\Controllers\Api\TeamController;
+use App\Http\Controllers\Api\LeagueController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::get('/sports/', [SportController::class, 'index']);
+Route::get('/sports/{sportSlug}', [SportController::class, 'leaguesBySport']);
+Route::get('/leagues/{leagueSlug}', [LeagueController::class, 'teamsByLeague']);
+Route::get('/teams/{teamSlug}', [TeamController::class, 'show']);
