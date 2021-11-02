@@ -1,11 +1,11 @@
 <template>
-    <div class="container" v-if="!isLoading">
+    <div class="container pb-5" v-if="!isLoading">
         <h2 class="display-6 fw-bold mb-5">{{ teamDetails.team_name }}</h2>
         <div class="row mb-4">
             <div class="col-md-3 mb-2">
                 <div class="teamdetail-logocontain" :style="{ 'background-image': 'url(' + teamDetails.image + ')' }"></div>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-9">
                 <h3 class="display-7 fw-bold mb-2">Team Information</h3>
                 <table class="table table-striped">
                     <tbody>
@@ -20,7 +20,7 @@
                     </tbody>
                 </table>
                 <h3 class="display-7 fw-bold mb-2 mt-4">Team Description</h3>
-                <p>{{ !teamDetails.description ? 'There is no description.' : teamDetails.description }}</p>
+                <p style="white-space: pre-line">{{ !teamDetails.description ? 'There is no description.' : teamDetails.description }}</p>
             </div>
         </div>
         <div class="mb-4">
