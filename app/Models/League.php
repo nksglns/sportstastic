@@ -8,6 +8,9 @@ class League extends BaseModel
 {
     protected $fillable = ['league_name', 'slug', 'sport_id', 'remote_id'];
 
+    //Hide some fields from the responses
+    protected $hidden = ['id', 'sport_id', 'pivot', 'created_at', 'updated_at', 'remote_id'];
+
     // Set the absolutely necessary validation rules
     public static $validateRules = [
         'remote_id' => 'integer',

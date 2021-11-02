@@ -10,6 +10,9 @@ class Standing extends BaseModel
         'season', 'remote_id'
     ];
 
+    //Hide some fields from the responses
+    protected $hidden = ['id', 'team_id', 'league_id', 'created_at', 'updated_at', 'remote_id'];
+
     // Set the absolutely necessary validation rules
     public static $validateRules = [
         'team_id' => 'required|integer',
@@ -25,4 +28,12 @@ class Standing extends BaseModel
         'season' => 'required|string',
         'remote_id' => 'integer',
     ];
+
+    /**
+     * Get the standings' league
+     */
+    public function league()
+    {
+        return $this->belongsTo(League::class);
+    }
 }

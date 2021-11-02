@@ -11,6 +11,9 @@ class Team extends BaseModel
 
     protected $fillable = ['team_name', 'stadium_name', 'website', 'description', 'remote_id'];
 
+    //Hide some fields from the responses
+    protected $hidden = ['id', 'pivot', 'created_at', 'updated_at', 'remote_id'];
+
     // Set the absolutely necessary validation rules
     public static $validateRules = [
         'remote_id' => 'integer',

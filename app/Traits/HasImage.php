@@ -34,7 +34,7 @@ trait HasImage
         if (file_exists($filename)) {
             return asset('public/images/' . $className . '/' . $this->id . '.png');
         } else {
-            return asset('assets/images/' . $className . '_default.png');
+            return asset('images/' . $className . '_default.png');
         }
     }
 }
