@@ -22,7 +22,7 @@ Run the database import command. This might take a while. This can also be used 
 $ php artisan sportdata:fetch
 ```
 
-Go to the public directory, and run the following command to link the public directory
+Go to the public directory, and run the following command to symlink the public directory
 
 ```bash
 $ ln -s ../storage/app/public public
@@ -30,4 +30,19 @@ $ ln -s ../storage/app/public public
 Or on windows via cmd
 ```bash
 mklink /D public ..\storage\app\public
+```
+
+Go back to the root of the project, install the required npm dependencies and build the assets
+
+```bash
+$ npm install
+```
+```bash
+$ npm run production
+```
+
+Finally, run the artisan serve command and open localhost:8000 in your local browser
+
+```bash
+$ php artisan serve
 ```
