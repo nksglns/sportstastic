@@ -92,7 +92,7 @@ class SportsdbApiService implements DataSourceApiInterface
                 'image' => $entry['strTeamLogo'] ?? null,
                 'stadium_name' => isset($entry['strWebsite']) ? mb_substr($entry['strStadium'], 0, 191) : '',
                 'website' => isset($entry['strWebsite']) ? mb_substr($entry['strWebsite'], 0, 191) : '',
-                'description' => isset($entry['strDescriptionEN']) ? mb_substr($entry['strDescriptionEN'], 0, 191) : '',
+                'description' => isset($entry['strDescriptionEN']) ? mb_substr($entry['strDescriptionEN'], 0, 30000) : '',
                 'leagues' => collect($leagues)->filter()->unique(),
             ];
         });
@@ -119,7 +119,7 @@ class SportsdbApiService implements DataSourceApiInterface
                 'image' => $entry['strTeamLogo'] ?? null,
                 'stadium_name' => isset($entry['strWebsite']) ? mb_substr($entry['strStadium'], 0, 191) : '',
                 'website' => isset($entry['strWebsite']) ? mb_substr($entry['strWebsite'], 0, 191) : '',
-                'description' => isset($entry['strDescriptionEN']) ? mb_substr($entry['strDescriptionEN'], 0, 191) : '',
+                'description' => isset($entry['strDescriptionEN']) ? mb_substr($entry['strDescriptionEN'], 0, 30000) : '',
                 'leagues' => collect($leagues)->filter()->unique(),
             ];
         });
