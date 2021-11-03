@@ -18,6 +18,14 @@ class League extends BaseModel
     ];
 
     /**
+     * Override default order by, set by league_name
+     */
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('league_name', 'asc')->get();
+    }
+
+    /**
      * Get the league's teams
      */
     public function teams()

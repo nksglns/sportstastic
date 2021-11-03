@@ -28,6 +28,15 @@ class Sport extends BaseModel
         return $this->hasMany(League::class);
     }
 
+
+    /**
+     * Override default order by, set by sport_name
+     */
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sport_name', 'asc')->get();
+    }
+
     /**
      * Generate the slug by using the mutator of the sport_name property
      */

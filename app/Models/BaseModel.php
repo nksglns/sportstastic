@@ -10,6 +10,13 @@ class BaseModel extends Model
     // won't have one
     public static $validateRules = [];
 
+    // Set a default ordered by scope
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('id', 'asc')->get();
+    }
+
+
     // Use the "saving" hook to check if a slug is duplicate and
     // append a modifier accordingly on all models
 

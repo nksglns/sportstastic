@@ -17,7 +17,7 @@ class BaseRepository implements BaseRepositoryInterface
     }
 
     public function all(){
-        return $this->model->get();
+        return $this->model->ordered();
     }
 
     /**

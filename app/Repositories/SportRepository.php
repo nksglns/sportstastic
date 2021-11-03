@@ -17,6 +17,6 @@ class SportRepository extends BaseRepository implements SportRepositoryInterface
         if (!$sportSlug || !$sport = Sport::where('slug', $sportSlug)->first()) {
             return false;
         }
-        return $sport->leagues()->get();
+        return $sport->leagues()->ordered();
     }
 }

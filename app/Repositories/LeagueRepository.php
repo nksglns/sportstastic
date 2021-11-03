@@ -40,6 +40,6 @@ class LeagueRepository extends BaseRepository implements LeagueRepositoryInterfa
         if (!$leagueSlug || !$league = League::where('slug', $leagueSlug)->first()) {
             return false;
         }
-        return $league->teams()->with('leagues', 'standings', 'standings.league')->get();
+        return $league->teams()->with('leagues', 'standings', 'standings.league')->ordered();
     }
 }
